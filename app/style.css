@@ -56,6 +56,12 @@ button, input, select { font: inherit; }
 .facts strong { display: block; font-size: 20px; color: var(--sand); }
 .facts span { color: var(--muted); font-size: 13px; }
 
+/* ---- Copy remaining ---- */
+.copy-row { display: flex; align-items: center; gap: 12px; margin-top: 16px; flex-wrap: wrap; }
+#copyRemaining { background: transparent; border-color: var(--teal); color: var(--teal); font-weight: 700; white-space: nowrap; }
+#copyRemaining:hover { background: var(--teal); color: var(--ink); border-color: var(--teal); }
+.copy-status { color: var(--sand); font-size: 14px; font-weight: 700; }
+
 /* ---- Trophy of the day ---- */
 .daily {
   margin-top: 18px; padding: 14px 16px; border-radius: 10px;

@@ -275,6 +275,72 @@ function fillDetail(t) {
   $("detailToggle").textContent = isEarned ? "Mark as not earned" : "Mark earned";
 }
 
+// ---- "Copy remaining": the unearned list as plain text ----
+
+// One short hint per trophy: the guide's opening, cut at a word boundary
+// under 90 characters so each copied line stays readable in a chat or a
+// notes app.
+function hintOf(t) {
+  const text = t.guide.replace(/\s+/g, " ").trim();
+  if (text.length <= 90) return text;
+  const cut = text.slice(0, 90);
+  const lastSpace = cut.lastIndexOf(" ");
+  return cut.slice(0, lastSpace > 60 ? lastSpace : 90) + "…";
+}
+
+// The exact text the button copies: one line per trophy not yet earned,
+// "[Grade] name — guide hint". Spoiler-safe mode never leaks a hidden
+// story trophy's name or guide into the clipboard either.
+function remainingText() {
+  const remaining = data.trophies.filter((t) => !earned.has(t.id));
+  if (remaining.length === 0) {
+    return "Vice City Trophy Guide — all 55 trophies earned. Nothing left to chase.";
+  }
+  return remaining.map((t) => {
+    if (isHidden(t)) return "[" + GRADE_LABEL[t.grade] + "] Hidden story trophy — hidden until earned.";
+    return "[" + GRADE_LABEL[t.grade] + "] " + t.name + " — " + hintOf(t);
+  }).join("\n");
+}
+
+let copyStatusTimer = null;
+
+async function copyRemaining() {
+  const text = remainingText();
+  const remaining = data.trophies.filter((t) => !earned.has(t.id)).length;
+  let ok = false;
+  try {
+    await navigator.clipboard.writeText(text);
+    ok = true;
+  } catch {
+    // The Clipboard API needs a secure context or a granted permission:
+    // fall back to a hidden textarea + execCommand, which also works on
+    // plain http:// when the guide is served locally.
+    try {
+      const ta = document.createElement("textarea");
+      ta.value = text;
+      ta.setAttribute("readonly", "");
+      ta.style.position = "fixed";
+      ta.style.opacity = "0";
+      document.body.appendChild(ta);
+      ta.select();
+      ok = document.execCommand("copy");
+      document.body.removeChild(ta);
+    } catch { ok = false; }
+  }
+  const status = $("copyStatus");
+  if (ok) {
+    status.textContent = remaining > 0
+      ? "Copied ✓ " + remaining + " trophies — paste it anywhere."
+      : "Copied ✓ all 55 earned — nothing left to chase.";
+    $("resultLine").textContent = "Copied " + remaining + " unearned trophies to the clipboard.";
+  } else {
+    status.textContent = "Copy failed — your browser blocked the clipboard.";
+    $("resultLine").textContent = "Copy failed — your browser blocked the clipboard.";
+  }
+  clearTimeout(copyStatusTimer);
+  copyStatusTimer = setTimeout(() => { status.textContent = ""; }, 4000);
+}
+
 // ---- Export / import / reset ----
 
 function exportProgress() {
@@ -322,6 +388,7 @@ function init() {
       renderDashboard(); renderList();
     });
     $("export").addEventListener("click", exportProgress);
+    $("copyRemaining").addEventListener("click", copyRemaining);
     $("random").addEventListener("click", pickRandomTrophy);
     $("dailyOpen").addEventListener("click", () => { if (dailyId != null) openDetail(dailyId); });
     $("import").addEventListener("change", (e) => { if (e.target.files[0]) importProgress(e.target.files[0]); e.target.value = ""; });
