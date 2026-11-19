@@ -56,6 +56,25 @@ button, input, select { font: inherit; }
 .facts strong { display: block; font-size: 20px; color: var(--sand); }
 .facts span { color: var(--muted); font-size: 13px; }
 
+/* ---- Trophy of the day ---- */
+.daily {
+  margin-top: 18px; padding: 14px 16px; border-radius: 10px;
+  background: var(--card); border: 1px solid var(--line);
+  display: flex; align-items: center; gap: 16px; flex-wrap: wrap;
+}
+.daily-label { margin: 0; font-size: 12px; letter-spacing: 0.1em; text-transform: uppercase; color: var(--sand); font-weight: 700; white-space: nowrap; }
+.daily-line { margin: 0; flex: 1; min-width: 220px; font-size: 15px; }
+.daily-line strong { color: var(--sand); }
+#dailyOpen { background: var(--pink); border-color: var(--pink); color: #fff; font-weight: 700; white-space: nowrap; }
+
+/* ---- Per-stage progress bars, under the dashboard ---- */
+.stage-bars { margin-top: 16px; display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px 22px; }
+.stage-bar { display: grid; grid-template-columns: 1fr auto; gap: 4px 10px; align-items: center; }
+.stage-bar-label { font-size: 13px; color: var(--muted); grid-column: 1; }
+.stage-bar-count { font-size: 13px; font-weight: 700; color: var(--sand); grid-column: 2; grid-row: 1; }
+.stage-bar-track { grid-column: 1 / -1; height: 8px; border-radius: 4px; background: #3a2560; overflow: hidden; }
+.stage-bar-fill { display: block; height: 100%; border-radius: 4px; background: linear-gradient(90deg, var(--teal), var(--sand)); transition: width 0.3s; }
+
 /* ---- Missable warning ---- */
 .warn { max-width: 1180px; margin: 20px auto 0; padding: 0 28px; }
 .warn h2 { font-size: 19px; color: #fff; }
@@ -152,5 +171,6 @@ footer h2 { font-size: 19px; color: var(--text); }
   .list { grid-template-columns: 1fr; }
   .stages { grid-template-columns: repeat(2, 1fr); }
   .facts { grid-template-columns: repeat(2, 1fr); }
+  .stage-bars { grid-template-columns: 1fr 1fr; }
   .hero h1 { font-size: 34px; }
 }
