@@ -49,6 +49,8 @@ button, input, select { font: inherit; }
 .bar { height: 12px; border-radius: 6px; background: #3a2560; overflow: hidden; }
 .bar-fill { height: 100%; width: 0%; border-radius: 6px; background: linear-gradient(90deg, var(--pink), var(--sand)); transition: width 0.3s; }
 .grade-line { color: var(--muted); margin: 10px 0 0; font-size: 14px; }
+.kind-line { color: var(--muted); margin: 6px 0 0; font-size: 13.5px; }
+#random { background: var(--pink); border-color: var(--pink); color: #fff; font-weight: 700; }
 .facts { display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; margin-top: 18px; }
 .facts div { background: var(--card); border: 1px solid var(--line); border-radius: 10px; padding: 10px 12px; }
 .facts strong { display: block; font-size: 20px; color: var(--sand); }

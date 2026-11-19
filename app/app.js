@@ -79,6 +79,18 @@ function renderDashboard() {
     " · Gold " + byGrade("gold") + "/" + totalGrade("gold") +
     " · Silver " + byGrade("silver") + "/" + totalGrade("silver") +
     " · Bronze " + byGrade("bronze") + "/" + totalGrade("bronze");
+  renderKindProgress();
+}
+
+// One earned/total pair per trophy kind, so the player can see at a glance
+// which corner of the list still needs work (story done, crime lagging, …).
+function renderKindProgress() {
+  const kinds = ["story", "side", "activities", "collectibles", "crime", "misc", "completion", "platinum"];
+  $("kindLine").textContent = kinds.map((k) => {
+    const total = data.trophies.filter((t) => t.kind === k).length;
+    const done = data.trophies.filter((t) => t.kind === k && earned.has(t.id)).length;
+    return KIND_LABEL[k] + " " + done + "/" + total;
+  }).join(" · ");
 }
 
 function renderStages() {
@@ -155,6 +167,19 @@ function toggleEarned(id) {
   saveProgress();
   renderDashboard(); renderStages(); renderList();
   if (detailId === id) fillDetail(data.trophies.find((t) => t.id === id));
+}
+
+// Stuck on what to chase next? Pick a random trophy you have not earned yet
+// and open its guide. Once every trophy is earned the pool is the whole list,
+// so the button keeps working as a way to revisit one at random.
+function pickRandomTrophy() {
+  const remaining = data.trophies.filter((t) => !earned.has(t.id));
+  const pool = remaining.length > 0 ? remaining : data.trophies;
+  const pick = pool[Math.floor(Math.random() * pool.length)];
+  openDetail(pick.id);
+  $("resultLine").textContent = remaining.length > 0
+    ? "Random pick from your " + remaining.length + " unearned trophies: " + (hiddenBySpoiler(pick) ? "a hidden story trophy — earn it to reveal the name." : pick.name + ".")
+    : "All 55 trophies earned — here is a random one to revisit.";
 }
 
 function openDetail(id) {
@@ -234,6 +259,7 @@ function init() {
       renderList();
     });
     $("export").addEventListener("click", exportProgress);
+    $("random").addEventListener("click", pickRandomTrophy);
     $("import").addEventListener("change", (e) => { if (e.target.files[0]) importProgress(e.target.files[0]); e.target.value = ""; });
     $("reset").addEventListener("click", () => {
       if (!confirm("Clear all earned trophies? This cannot be undone — export first if you want a copy.")) return;
