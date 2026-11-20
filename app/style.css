@@ -114,6 +114,10 @@ button, input, select { font: inherit; }
 .toggles { display: flex; gap: 16px; align-items: center; flex-wrap: wrap; margin-top: 14px; font-size: 14px; }
 .toggle { display: flex; gap: 7px; align-items: center; color: var(--muted); cursor: pointer; }
 .toggle input { width: 17px; height: 17px; accent-color: var(--pink); }
+/* Hide earned: teal (the earned colour) instead of pink, so the toggle
+   reads as part of the progress UI. The label turns teal while it is on. */
+.toggle.hide-earned input { accent-color: var(--teal); }
+.toggle.hide-earned:has(input:checked) { color: var(--teal); }
 .spacer { flex: 1; }
 button, .import-btn {
   border: 1px solid var(--line); background: var(--card); color: var(--text);

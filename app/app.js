@@ -6,6 +6,7 @@
 
 const STORE_KEY = "gta6-trophy-checklist";
 const SPOILER_KEY = "gta6-trophy-spoiler";
+const HIDE_EARNED_KEY = "gta6-trophy-hide-earned";
 
 // The six-stage platinum roadmap. The text is the author's own summary of
 // what each stage asks; the counts are checked against trophies.json by the
@@ -37,6 +38,7 @@ const KIND_ORDER = ["story", "side", "activities", "collectibles", "crime", "mis
 let data = null;          // the parsed trophies.json document
 let earned = new Set();   // ids the player has ticked
 let spoiler = false;      // spoiler-safe mode on or off
+let hideEarned = false;   // hide earned trophies from the grid
 let kindFilter = "all";
 let gradeFilter = "all";
 let query = "";
@@ -58,6 +60,7 @@ function loadProgress() {
     earned = new Set(raw.filter((id) => Number.isInteger(id)));
   } catch { earned = new Set(); }
   spoiler = localStorage.getItem(SPOILER_KEY) === "1";
+  hideEarned = localStorage.getItem(HIDE_EARNED_KEY) === "1";
 }
 
 function saveProgress() {
@@ -174,6 +177,9 @@ function trophyMatches(t) {
   if (kindFilter !== "all" && kindFilter !== "missable" && t.kind !== kindFilter) return false;
   if (gradeFilter !== "all" && t.grade !== gradeFilter) return false;
   if (missableOnly && !t.missable) return false;
+  // Hide earned: earned trophies leave the grid while the toggle is on.
+  // It composes with every other filter — each check above still applies.
+  if (hideEarned && earned.has(t.id)) return false;
   if (query) {
     const hay = (t.name + " " + t.description + " " + t.guide).toLowerCase();
     if (!hay.includes(query)) return false;
@@ -377,6 +383,7 @@ function init() {
   loadData().then(() => {
     loadProgress();
     $("spoiler").checked = spoiler;
+    $("hideEarned").checked = hideEarned;
     renderDashboard(); renderStages(); renderChips(); renderList();
 
     $("search").addEventListener("input", (e) => { query = e.target.value.trim().toLowerCase(); renderList(); });
@@ -386,6 +393,14 @@ function init() {
       spoiler = e.target.checked;
       localStorage.setItem(SPOILER_KEY, spoiler ? "1" : "0");
       renderDashboard(); renderList();
+    });
+    // Hide earned: persist the toggle beside the checklist and re-filter
+    // the grid. The dashboard counts are untouched — they still show the
+    // true earned total even while earned cards are hidden.
+    $("hideEarned").addEventListener("change", (e) => {
+      hideEarned = e.target.checked;
+      localStorage.setItem(HIDE_EARNED_KEY, hideEarned ? "1" : "0");
+      renderList();
     });
     $("export").addEventListener("click", exportProgress);
     $("copyRemaining").addEventListener("click", copyRemaining);
